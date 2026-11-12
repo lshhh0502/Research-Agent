@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#171819">
+  <title>RA · Workspace</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Workspace and conversations">
+      <a class="wordmark" href="/">RA<span class="brand-note">Research Agent</span></a>
+      <div class="project-switch"><span class="project-icon" data-icon="folder"></span><span id="project-name">RA</span><span class="local-tag">Local</span></div>
+      <button class="new-chat" id="new-chat"><span data-icon="plus"></span>New conversation<kbd>⌘ K</kbd></button>
+      <nav class="primary-nav" aria-label="Main navigation">
+        <button data-page="workspace" class="nav-item active"><span data-icon="home"></span>Workspace</button>
+        <button data-page="skills" class="nav-item"><span data-icon="grid"></span>Skills<span class="nav-count" id="skill-count"></span></button>
+        <button data-page="evaluation" class="nav-item"><span data-icon="chart"></span>Evaluation</button>
+        <button data-page="memory" class="nav-item"><span data-icon="database"></span>Memory</button>
+      </nav>
+      <div class="session-heading"><span>Recent conversations</span><button class="icon-button" id="refresh-sessions" title="Refresh conversations" aria-label="Refresh conversations"><span data-icon="refresh"></span></button></div>
+      <div id="sessions" class="session-list"><p class="sidebar-hint">Loading conversations…</p></div>
+      <div class="sidebar-bottom"><button data-page="settings" class="nav-item"><span data-icon="settings"></span>Settings</button><div class="connection"><i id="connection-dot"></i><span id="connection-label">Connecting to local service</span><span class="version">WEB</span></div></div>
+    </aside>
+    <div class="mobile-scrim" id="mobile-scrim" hidden></div>
+    <div class="main-shell">
+      <header class="topbar">
+        <button class="icon-button mobile-menu" id="mobile-menu" aria-label="Open navigation"><span data-icon="menu"></span></button>
+        <div class="breadcrumb"><span class="breadcrumb-icon" data-icon="folder"></span><span id="breadcrumb-project">RA</span><span class="slash">/</span><span id="breadcrumb-title">New conversation</span></div>
+        <span class="mode-chip" id="header-mode">Default permissions</span>
+        <div class="topbar-end"><span class="local-status">Local workspace</span><button class="icon-button" id="toggle-inspector" title="Toggle task details" aria-label="Toggle task details" aria-controls="inspector"><span data-icon="panel"></span></button></div>
+      </header>
+      <div class="workspace" id="workspace">
+        <main class="chat-panel" aria-label="Conversation workspace">
+          <div class="chat-scroll" id="chat-scroll" tabindex="0" aria-label="Chat history">
+            <div class="chat-content">
+              <div class="conversation-heading" id="conversation-heading"><h1 id="conversation-title">New conversation</h1><p>Follow your research as it progresses.</p></div>
+              <div id="messages" aria-live="polite" aria-relevant="additions text"></div>
+            </div>
+          </div>
+          <div class="latest-message-control"><button type="button" class="latest-message-button" id="latest-message" hidden><span data-icon="arrow-up"></span>Jump to latest message</button></div>
+          <div class="composer-region">
+            <div class="attachment-list" id="attachments"></div>
+            <form class="composer" id="composer">
+              <label class="sr-only" for="prompt">Describe your task</label>
+              <textarea id="prompt" rows="2" placeholder="Ask a research question or type / to use a Skill…" maxlength="100000"></textarea>
+              <div class="composer-toolbar">
+                <button type="button" class="text-button" id="attach-file" title="Attach text files"><span data-icon="paperclip"></span><span>Attach files</span></button>
+                <span class="toolbar-divider"></span>
+                <label class="permission-select"><span data-icon="shield"></span><select id="permission-mode" aria-label="Permission mode"><option value="default">Default permissions</option><option value="plan">Read-only planning</option><option value="acceptEdits">Auto-accept edits</option><option value="dontAsk">Deny approval requests</option></select></label>
+                <button type="submit" class="send-button" id="send-button" aria-label="Send task" title="Send task · Enter"><span data-icon="arrow-up"></span></button>
+                <button type="button" class="stop-button" id="stop-button" hidden><span data-icon="stop"></span>Stop</button>
+              </div>
+            </form>
+            <input type="file" id="file-input" accept=".txt,.md,.py,.js,.ts,.tsx,.jsx,.json,.yaml,.yml,.toml,.css,.html,.csv,.log,.sh,.sql,.xml" multiple hidden>
+            <div class="composer-footnote"><span id="model-label">Loading model configuration</span><span>Enter to send · Shift + Enter for a new line</span></div>
+          </div>
+        </main>
+        <aside class="inspector" id="inspector" aria-label="Task details">
+          <div class="inspector-title"><h2>Task details</h2><span id="run-status" class="tiny-badge">Ready</span></div>
+          <div class="inspector-tabs" role="tablist" aria-label="Task detail tabs"><button class="selected" id="plan-tab" role="tab" aria-selected="true">Activity</button><button id="files-tab" role="tab" aria-selected="false">Files</button></div>
+          <div id="execution-panel" class="inspector-section"><div id="task-timeline"></div></div>
+          <div class="inspector-section"><div class="section-label"><h3>Changed files</h3><span id="file-count"></span></div><div id="changed-files" class="muted-empty">No file changes yet</div></div>
+          <div class="inspector-section"><div class="section-label"><h3>Skill candidates</h3><button class="text-button" data-page="skills">View<span data-icon="arrow-right"></span></button></div><div id="candidate-preview" class="muted-empty">No candidates awaiting review</div><p class="inspector-note">Published after passing evaluation or manual review</p></div>
+          <div class="usage-section"><div class="section-label"><span>Session tokens</span><span id="token-total">0</span></div><div class="usage-details"><span>Input <b id="input-tokens">0</b></span><span>Output <b id="output-tokens">0</b></span></div></div>
+        </aside>
+      </div>
+      <main id="library-page" class="library-page" hidden></main>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <dialog id="detail-dialog"><div class="dialog-heading"><h2 id="detail-title"></h2><button class="icon-button" id="close-detail" aria-label="Close details"><span data-icon="close"></span></button></div><div id="detail-body" class="detail-body"></div></dialog>
+</body>
+</html>
